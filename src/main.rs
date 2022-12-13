@@ -1,10 +1,18 @@
-use axum::{response::Html, routing::get, Router};
+use axum::Router;
 use std::net::SocketAddr;
+
+pub mod controllers;
+pub mod services;
+
+use crate::controllers::root::register_root_controller;
 
 #[tokio::main]
 async fn main() {
-    // build our application with a route
-    let app = Router::new().route("/", get(handler));
+    // build our application
+    let mut app = Router::new();
+
+    // add root route
+    app = register_root_controller(app).await;
 
     // run it
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
@@ -13,8 +21,4 @@ async fn main() {
         .serve(app.into_make_service())
         .await
         .unwrap();
-}
-
-async fn handler() -> Html<&'static str> {
-    Html("<h1>Hello, World!</h1>")
 }
